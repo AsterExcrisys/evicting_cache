@@ -22,6 +22,9 @@ public class LRUCache {
     }
 
     public int get(int key) {
+        if (key < 0) {
+            return -1;
+        }
         int index = searchKey(key);
         if (index >= 0) {
             int value = values[index];
@@ -38,6 +41,9 @@ public class LRUCache {
     }
 
     public void put(int key, int value) {
+        if (key < 0) {
+            return;
+        }
         int index = searchKey(key);
         if (index >= 0) {
             for (int i = (index - 1); i >= 0; i--) {
@@ -52,6 +58,23 @@ public class LRUCache {
         }
         keys[0] = key;
         values[0] = value;
+    }
+
+    public void remove(int key) {
+        int index = searchKey(key);
+        if (index >= 0) {
+            for (int i = (index + 1); i < keys.length; i++) {
+                keys[i - 1] = keys[i];
+                values[i - 1] = values[i];
+            }
+            keys[keys.length - 1] = -1;
+            values[keys.length - 1] = -1;
+        }
+    }
+
+    public void clear() {
+        fillKeys(-1);
+        fillValues(-1);
     }
 
     private void fillKeys(int key) {
