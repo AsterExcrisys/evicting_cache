@@ -1,12 +1,11 @@
 package com.asterexcrisys.evicache.fixed;
 
+import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-@SuppressWarnings("unused")
-public class LFUCache<K, V> {
+@SuppressWarnings({"unused", "Duplicates"})
+public class LFUCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
@@ -88,7 +87,7 @@ public class LFUCache<K, V> {
             return null;
         }
         V top = values[0];
-        remove(keys[0]);
+        remove(0);
         return top;
     }
 
@@ -97,7 +96,7 @@ public class LFUCache<K, V> {
             return null;
         }
         V bottom = values[size - 1];
-        remove(keys[size - 1]);
+        remove(size - 1);
         return bottom;
     }
 
@@ -106,7 +105,7 @@ public class LFUCache<K, V> {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
         V top = values[0];
-        remove(keys[0]);
+        remove(0);
         return top;
     }
 
@@ -115,7 +114,7 @@ public class LFUCache<K, V> {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
         V bottom = values[size - 1];
-        remove(keys[size - 1]);
+        remove(size - 1);
         return bottom;
     }
 
@@ -125,10 +124,7 @@ public class LFUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            V value = values[index];
-            frequencies[index]++;
-            sort();
-            return value;
+            return get(index);
         }
         return null;
     }
@@ -146,6 +142,7 @@ public class LFUCache<K, V> {
         if (index >= 0) {
             values[index] = value;
             frequencies[index]++;
+            sort(index);
         } else {
             if (size < capacity) {
                 size++;
@@ -153,8 +150,8 @@ public class LFUCache<K, V> {
             keys[size - 1] = key;
             values[size - 1] = value;
             frequencies[size - 1] = 1;
+            sort(size - 1);
         }
-        sort();
     }
 
     public void remove(K key) throws IllegalArgumentException {
@@ -163,16 +160,7 @@ public class LFUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            if (size > 0) {
-                size--;
-            }
-            for (int i = index + 1; i < size + 1; i++) {
-                keys[i - 1] = keys[i];
-                values[i - 1] = values[i];
-            }
-            keys[size] = null;
-            values[size] = null;
-            frequencies[size] = null;
+            remove(index);
         }
     }
 
@@ -196,46 +184,55 @@ public class LFUCache<K, V> {
 
     private V get(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index > size - 1) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("index out of bounds");
         }
-        K key = keys[index];
         V value = values[index];
-        for (int i = index - 1; i >= 0; i--) {
-            keys[i + 1] = keys[i];
-            values[i + 1] = values[i];
-        }
-        keys[0] = key;
-        values[0] = value;
+        frequencies[index]++;
+        sort(index);
         return value;
     }
 
-    private void sort() {
-        if (size < 2) {
-            return;
+    private void remove(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index > size - 1) {
+            throw new IndexOutOfBoundsException("index out of bounds");
         }
-        Integer[] indexes = new Integer[size];
-        for (int i = 0; i < size; i++) {
-            indexes[i] = i;
+        if (size > 0) {
+            size--;
         }
-        int maximum = frequencies[0];
-        AtomicBoolean isSorted = new AtomicBoolean(true);
-        Arrays.sort(indexes, Comparator.comparingInt((Integer index) -> {
-            if (frequencies[index] > maximum) {
-                isSorted.set(false);
+        for (int i = index + 1; i < size + 1; i++) {
+            keys[i - 1] = keys[i];
+            values[i - 1] = values[i];
+            frequencies[i - 1] = frequencies[i];
+        }
+        keys[size] = null;
+        values[size] = null;
+        frequencies[size] = null;
+    }
+
+    private void sort(int start) throws IndexOutOfBoundsException {
+        if (start < 0 || start > size - 1) {
+            throw new IndexOutOfBoundsException("index out of bounds");
+        }
+        for (int i = start; i >= 1; i--) {
+            if (frequencies[i - 1] > frequencies[i]) {
+                break;
             }
-            return frequencies[index];
-        }).reversed());
-        if (isSorted.get()) {
-            return;
+            swap(keys, i - 1, i);
+            swap(values, i - 1, i);
+            swap(frequencies, i - 1, i);
         }
-        K[] keys = keys();
-        V[] values = values();
-        Integer[] frequencies = frequencies();
-        for (int i = 0; i < size; i++) {
-            this.keys[i] = keys[indexes[i]];
-            this.values[i] = values[indexes[i]];
-            this.frequencies[i] = frequencies[indexes[i]];
+    }
+
+    private static <T> void swap(T[] array, int i, int j) throws IllegalArgumentException, IndexOutOfBoundsException {
+        if (array == null) {
+            throw new IllegalArgumentException("array cannot be null");
         }
+        if (i < 0 || j < 0 || i > array.length - 1 || j > array.length - 1) {
+            throw new IndexOutOfBoundsException();
+        }
+        T tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
     }
 
     @Override
@@ -265,7 +262,7 @@ public class LFUCache<K, V> {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
         for (int i = 0; i < size; i++) {
-            builder.append(String.format("%s: %s", keys[i], values[i]));
+            builder.append(String.format("%s: %s (%s)", keys[i], values[i], frequencies[i]));
             if (i < size - 1) {
                 builder.append(", ");
             }

@@ -1,10 +1,11 @@
 package com.asterexcrisys.evicache.fixed;
 
+import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-@SuppressWarnings("unused")
-public class MRUCache<K, V> {
+@SuppressWarnings({"unused", "Duplicates"})
+public class MRUCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
@@ -32,11 +33,11 @@ public class MRUCache<K, V> {
     }
 
     public K[] keys() {
-        return Arrays.copyOfRange(keys, capacity - size, capacity);
+        return Arrays.copyOf(keys, size);
     }
 
     public V[] values() {
-        return Arrays.copyOfRange(values, capacity - size, capacity);
+        return Arrays.copyOf(values, size);
     }
 
     public boolean isEmpty() {
@@ -48,66 +49,66 @@ public class MRUCache<K, V> {
     }
 
     public V peekTop() {
-        if (keys[capacity - size] == null) {
+        if (keys[0] == null) {
             return null;
         }
-        return get(capacity - size);
+        return get(0);
     }
 
     public V peekBottom() {
-        if (keys[capacity - 1] == null) {
+        if (keys[size - 1] == null) {
             return null;
         }
-        return get(capacity - 1);
+        return get(size - 1);
     }
 
     public V elementTop() throws NoSuchElementException {
-        if (keys[capacity - size] == null) {
+        if (keys[0] == null) {
             throw new NoSuchElementException("cannot peek an empty cache");
         }
-        return get(capacity - size);
+        return get(0);
     }
 
     public V elementBottom() throws NoSuchElementException {
-        if (keys[capacity - 1] == null) {
+        if (keys[size - 1] == null) {
             throw new NoSuchElementException("cannot peek an empty cache");
         }
-        return get(capacity - 1);
+        return get(size - 1);
     }
 
     public V popTop() {
-        if (keys[capacity - size] == null) {
+        if (keys[0] == null) {
             return null;
         }
-        V top = values[capacity - size];
-        remove(keys[capacity - size]);
+        V top = values[0];
+        remove(0);
         return top;
     }
 
     public V popBottom() {
-        if (keys[capacity - 1] == null) {
+        if (keys[size - 1] == null) {
             return null;
         }
-        V bottom = values[capacity - 1];
-        remove(keys[capacity - 1]);
+        V bottom = values[size - 1];
+        remove(size - 1);
         return bottom;
     }
 
     public V pollTop() throws NoSuchElementException {
-        if (keys[capacity - size] == null) {
+        if (keys[0] == null) {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
-        V top = values[capacity - size];
-        remove(keys[capacity - size]);
+        V top = values[0];
+        remove(0);
         return top;
     }
 
     public V pollBottom() throws NoSuchElementException {
-        if (keys[capacity - 1] == null) {
+        if (keys[size - 1] == null) {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
-        V bottom = values[capacity - 1];
-        remove(keys[capacity - 1]);
+        V bottom = values[size - 1];
+        remove(size - 1);
         return bottom;
     }
 
@@ -117,14 +118,7 @@ public class MRUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            V value = values[index];
-            for (int i = index + 1; i < capacity; i++) {
-                keys[i - 1] = keys[i];
-                values[i - 1] = values[i];
-            }
-            keys[capacity - 1] = key;
-            values[capacity - 1] = value;
-            return value;
+            return get(index);
         }
         return null;
     }
@@ -140,7 +134,7 @@ public class MRUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            for (int i = index + 1; i < capacity; i++) {
+            for (int i = index + 1; i < size; i++) {
                 keys[i - 1] = keys[i];
                 values[i - 1] = values[i];
             }
@@ -148,13 +142,9 @@ public class MRUCache<K, V> {
             if (size < capacity) {
                 size++;
             }
-            for (int i = 1; i < capacity; i++) {
-                keys[i - 1] = keys[i];
-                values[i - 1] = values[i];
-            }
         }
-        keys[capacity - 1] = key;
-        values[capacity - 1] = value;
+        keys[size - 1] = key;
+        values[size - 1] = value;
     }
 
     public void remove(K key) throws IllegalArgumentException {
@@ -163,15 +153,7 @@ public class MRUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            if (size > 0) {
-                size--;
-            }
-            for (int i = index - 1; i >= 0; i--) {
-                keys[i + 1] = keys[i];
-                values[i + 1] = values[i];
-            }
-            keys[0] = null;
-            values[0] = null;
+            remove(index);
         }
     }
 
@@ -185,7 +167,7 @@ public class MRUCache<K, V> {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        for (int i = capacity - size; i < capacity; i++) {
+        for (int i = 0; i < size; i++) {
             if (keys[i] != null && keys[i].equals(key)) {
                 return i;
             }
@@ -194,18 +176,33 @@ public class MRUCache<K, V> {
     }
 
     private V get(int index) throws IndexOutOfBoundsException {
-        if (index < capacity - size || index > capacity - 1) {
-            throw new IndexOutOfBoundsException();
+        if (index < 0 || index > size - 1) {
+            throw new IndexOutOfBoundsException("index out of bounds");
         }
         K key = keys[index];
         V value = values[index];
-        for (int i = index + 1; i < capacity; i++) {
+        for (int i = index + 1; i < size; i++) {
             keys[i - 1] = keys[i];
             values[i - 1] = values[i];
         }
-        keys[capacity - 1] = key;
-        values[capacity - 1] = value;
+        keys[size - 1] = key;
+        values[size - 1] = value;
         return value;
+    }
+
+    private void remove(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index > size - 1) {
+            throw new IndexOutOfBoundsException("index out of bounds");
+        }
+        if (size > 0) {
+            size--;
+        }
+        for (int i = index + 1; i < size + 1; i++) {
+            keys[i - 1] = keys[i];
+            values[i - 1] = values[i];
+        }
+        keys[size] = null;
+        values[size] = null;
     }
 
     @Override
@@ -219,7 +216,7 @@ public class MRUCache<K, V> {
         if (capacity != other.capacity) {
             return false;
         }
-        for (int i = capacity - size; i < capacity; i++) {
+        for (int i = 0; i < size; i++) {
             if (!keys[i].equals(other.keys[i])) {
                 return false;
             }
@@ -234,9 +231,9 @@ public class MRUCache<K, V> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
-        for (int i = capacity - size; i < capacity; i++) {
+        for (int i = 0; i < size; i++) {
             builder.append(String.format("%s: %s", keys[i], values[i]));
-            if (i < capacity - 1) {
+            if (i < size - 1) {
                 builder.append(", ");
             }
         }

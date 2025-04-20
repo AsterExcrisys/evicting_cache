@@ -1,10 +1,11 @@
 package com.asterexcrisys.evicache.fixed;
 
+import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-@SuppressWarnings("unused")
-public class LRUCache<K, V> {
+@SuppressWarnings({"unused", "Duplicates"})
+public class LRUCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
@@ -80,7 +81,7 @@ public class LRUCache<K, V> {
             return null;
         }
         V top = values[0];
-        remove(keys[0]);
+        remove(0);
         return top;
     }
 
@@ -89,7 +90,7 @@ public class LRUCache<K, V> {
             return null;
         }
         V bottom = values[size - 1];
-        remove(keys[size - 1]);
+        remove(size - 1);
         return bottom;
     }
 
@@ -98,7 +99,7 @@ public class LRUCache<K, V> {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
         V top = values[0];
-        remove(keys[0]);
+        remove(0);
         return top;
     }
 
@@ -107,7 +108,7 @@ public class LRUCache<K, V> {
             throw new NoSuchElementException("cannot pop an empty cache");
         }
         V bottom = values[size - 1];
-        remove(keys[size - 1]);
+        remove(size - 1);
         return bottom;
     }
 
@@ -117,14 +118,7 @@ public class LRUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            V value = values[index];
-            for (int i = index - 1; i >= 0; i--) {
-                keys[i + 1] = keys[i];
-                values[i + 1] = values[i];
-            }
-            keys[0] = key;
-            values[0] = value;
-            return value;
+            return get(index);
         }
         return null;
     }
@@ -163,15 +157,7 @@ public class LRUCache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            if (size > 0) {
-                size--;
-            }
-            for (int i = index + 1; i < size + 1; i++) {
-                keys[i - 1] = keys[i];
-                values[i - 1] = values[i];
-            }
-            keys[size] = null;
-            values[size] = null;
+            remove(index);
         }
     }
 
@@ -195,7 +181,7 @@ public class LRUCache<K, V> {
 
     private V get(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index > size - 1) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("index out of bounds");
         }
         K key = keys[index];
         V value = values[index];
@@ -206,6 +192,21 @@ public class LRUCache<K, V> {
         keys[0] = key;
         values[0] = value;
         return value;
+    }
+
+    private void remove(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index > size - 1) {
+            throw new IndexOutOfBoundsException("index out of bounds");
+        }
+        if (size > 0) {
+            size--;
+        }
+        for (int i = index + 1; i < size + 1; i++) {
+            keys[i - 1] = keys[i];
+            values[i - 1] = values[i];
+        }
+        keys[size] = null;
+        values[size] = null;
     }
 
     @Override
