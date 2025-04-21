@@ -25,16 +25,16 @@ public class CacheRecorder {
     }
     
     public HashMap<String, Integer> metrics() {
-        HashMap<String, Integer> statistics = new HashMap<>();
-        statistics.put(MetricType.CACHE_HITS.identifier(), cacheHits);
-        statistics.put(MetricType.CACHE_MISSES.identifier(), cacheMisses);
-        statistics.put(MetricType.CACHE_PUTS.identifier(), cachePuts);
-        statistics.put(MetricType.CACHE_REMOVES.identifier(), cacheRemoves);
-        statistics.put(MetricType.CACHE_EVICTIONS.identifier(), cacheEvictions);
-        statistics.put(MetricType.CACHE_CLEARS.identifier(), cacheClears);
-        statistics.put(MetricType.CACHE_SIZE.identifier(), cacheSize);
-        statistics.put(MetricType.CACHE_CAPACITY.identifier(), cacheCapacity);
-        return statistics;
+        HashMap<String, Integer> metrics = new HashMap<>();
+        metrics.put(MetricType.CACHE_HITS.identifier(), cacheHits);
+        metrics.put(MetricType.CACHE_MISSES.identifier(), cacheMisses);
+        metrics.put(MetricType.CACHE_PUTS.identifier(), cachePuts);
+        metrics.put(MetricType.CACHE_REMOVES.identifier(), cacheRemoves);
+        metrics.put(MetricType.CACHE_EVICTIONS.identifier(), cacheEvictions);
+        metrics.put(MetricType.CACHE_CLEARS.identifier(), cacheClears);
+        metrics.put(MetricType.CACHE_SIZE.identifier(), cacheSize);
+        metrics.put(MetricType.CACHE_CAPACITY.identifier(), cacheCapacity);
+        return metrics;
     }
     
     public void hit() {
