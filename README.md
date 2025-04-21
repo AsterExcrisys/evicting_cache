@@ -60,7 +60,9 @@ com.asterexcrisys.evicache
 │
 ├── Cache.java              # Interface that any and all caches implement
 ├── CacheBuilder.java       # Self-explanatory, used to easily build caches with different eviction strategies
-└── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
+├── CacheRecorder.java      # Self-explanatory, used to record core metrics of any type of cache
+├── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
+└── MetricType.java         # Enumeration that contains any and all types of metrics recorded by CacheRecorder
 ```
 
 ---
@@ -76,7 +78,6 @@ com.asterexcrisys.evicache
 
 ```java
 import com.asterexcrisys.evicache.CacheBuilder;
-
 import java.util.concurrent.TimeUnit;
 
 public class Main {
