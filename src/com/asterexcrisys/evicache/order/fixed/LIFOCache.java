@@ -139,12 +139,8 @@ public class LIFOCache<K, V> implements Cache<K, V> {
             if (size < capacity) {
                 size++;
             }
-            for (int i = size - 2; i >= 0; i--) {
-                keys[i + 1] = keys[i];
-                values[i + 1] = values[i];
-            }
-            keys[0] = key;
-            values[0] = value;
+            keys[size - 1] = key;
+            values[size - 1] = value;
         }
     }
 

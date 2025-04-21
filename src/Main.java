@@ -1,13 +1,15 @@
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheBuilder;
 import com.asterexcrisys.evicache.EvictionPolicy;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
     public static void main(String[] args) {
         Cache<Integer, String> cache = CacheBuilder
                 .<Integer, String>newBuilder()
-                .evictionPolicy(EvictionPolicy.FIFO)
+                .evictionPolicy(EvictionPolicy.LIFO)
+                .expireTime(1, TimeUnit.MINUTES)
                 .fixedCapacity(true)
                 .initialCapacity(10)
                 .build();
@@ -21,15 +23,13 @@ public class Main {
         cache.put(8, "eight");
         cache.put(9, "nine");
         cache.put(10, "ten");
-        cache.put(11, "eleven");
         System.out.println(cache);
-        cache.get(1);
-        cache.get(2);
-        cache.get(3);
-        cache.get(1);
-        cache.get(4);
-        cache.get(4);
+        cache.put(11, "eleven");
         cache.put(0, "zero");
+        System.out.println(cache);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(cache.popTop());
+        }
         System.out.println(cache);
     }
 
