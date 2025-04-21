@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
+@SuppressWarnings("unused")
 public interface Cache<K, V> {
 
     /**
