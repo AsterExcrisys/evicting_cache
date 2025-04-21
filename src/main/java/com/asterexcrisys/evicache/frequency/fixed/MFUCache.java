@@ -172,6 +172,7 @@ public class MFUCache<K, V> implements Cache<K, V> {
     public void clear() {
         Arrays.fill(keys, null);
         Arrays.fill(values, null);
+        Arrays.fill(frequencies, null);
         size = 0;
     }
 
@@ -255,6 +256,9 @@ public class MFUCache<K, V> implements Cache<K, V> {
                 return false;
             }
             if (!values[i].equals(other.values[i])) {
+                return false;
+            }
+            if (!frequencies[i].equals(other.frequencies[i])) {
                 return false;
             }
         }

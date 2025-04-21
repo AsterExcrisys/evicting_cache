@@ -1,6 +1,7 @@
 package com.asterexcrisys.evicache;
 
 import com.asterexcrisys.evicache.access.fixed.*;
+import com.asterexcrisys.evicache.extra.fixed.PriorityCache;
 import com.asterexcrisys.evicache.extra.fixed.RandomCache;
 import com.asterexcrisys.evicache.frequency.fixed.LFUCache;
 import com.asterexcrisys.evicache.frequency.fixed.MFUCache;
@@ -109,7 +110,7 @@ public class CacheBuilder<K, V> {
             }
             case PRIORITY -> {
                 if (isFixed) {
-                    yield null;
+                    yield new PriorityCache<>(capacity);
                 }
                 yield null;
             }

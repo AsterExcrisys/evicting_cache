@@ -49,7 +49,7 @@ com.asterexcrisys.evicache
 │       ├── TimeCache.java
 │       └── ExpireCache.java
 │
-├── extra               # Extra cache implementations (Ex.: priority-based)
+├── extra               # Extra cache implementations (e.g priority-based or random-based)
 │   ├── fixed                   # Fixed-size versions
 │   │   ├── PriorityCache.java
 │   │   └── RandomCache.java
@@ -67,10 +67,24 @@ com.asterexcrisys.evicache
 
 ---
 
+## 🧰 Technologies Used
+
+| Category        | Tool / Technology              | Notes                                         |
+|-----------------|--------------------------------|-----------------------------------------------|
+| Language        | Java 17                        | Modern LTS version                            |
+| Build Tool      | Maven                          | With annotation processing + JMH support      |
+| Testing         | JUnit 5                        | For unit and integration testing              |
+| Benchmarking    | JMH                            | For precise micro-benchmarking                |
+| Documentation   | Javadoc and GitHub Wikis       | Interface and API documentation               |
+| Caching Design  | Custom `Cache<K, V>` interface | Supports top/bottom access and eviction logic |
+| IDE             | IntelliJ IDEA                  | With annotation processing enabled            |
+
+---
+
 ## 🚀 Getting Started
 
 ### 🛠 Requirements
-- Java 16 or higher
+- Java 17 or higher
 - Maven (recommended as the project build system)
 - IntelliJ IDEA (recommended for project structure)
 
@@ -139,10 +153,20 @@ public class Main {
 ---
 
 ## 📈 Future Improvements
+- ✅ Provide extensive documentation (both via Javadoc and GitHub Wikis)
 - ⏳ Add thread-safe versions
-- ⏳ Serialization support
-- ⏳ Benchmark performance for each strategy
+- ⏳ Add serialization support
+- ⏳ Add iterator support
+- ⏳ Add benchmark performance for each strategy
 - ⏳ Add FIFO, LIFO, Time/Expire, and Random eviction strategies
+
+---
+
+## 🔍 Considerations
+
+Considering the results of the benchmarks performed on access-based and frequency-based caches, reporting that the `remove` operation is by far the most time-consuming, I have come to the conclusion that such is because of it immediately nullifying the elements removed and thus indirectly calling the garbage collector to free up the unreferenced memory addresses, for this reason I am taking into account the possibility of implementing a `lazy remove` instead.
+
+A `lazy remove` will leave the elements referenced in the array and just reduce the size, so that they become 'virtually inaccesible'. The actual removal will happen when they are overwritten by new elements or evicted completely from the cache.
 
 ---
 
