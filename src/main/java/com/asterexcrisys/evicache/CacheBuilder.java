@@ -1,6 +1,7 @@
 package com.asterexcrisys.evicache;
 
 import com.asterexcrisys.evicache.access.fixed.*;
+import com.asterexcrisys.evicache.extra.fixed.RandomCache;
 import com.asterexcrisys.evicache.frequency.fixed.LFUCache;
 import com.asterexcrisys.evicache.frequency.fixed.MFUCache;
 import com.asterexcrisys.evicache.order.fixed.FIFOCache;
@@ -56,7 +57,7 @@ public class CacheBuilder<K, V> {
         return this;
     }
 
-    public Cache<K, V> build() throws IllegalArgumentException {
+    public Cache<K, V> build() {
         return switch (policy) {
             case LRU -> {
                 if (isFixed) {
@@ -94,8 +95,29 @@ public class CacheBuilder<K, V> {
                 }
                 yield null;
             }
-            default -> {
-                throw new IllegalArgumentException("Invalid policy: " + policy);
+            case TIME -> {
+                if (isFixed) {
+                    yield null;
+                }
+                yield null;
+            }
+            case EXPIRE -> {
+                if (isFixed) {
+                    yield null;
+                }
+                yield null;
+            }
+            case PRIORITY -> {
+                if (isFixed) {
+                    yield null;
+                }
+                yield null;
+            }
+            case RANDOM -> {
+                if (isFixed) {
+                    yield new RandomCache<>(capacity);
+                }
+                yield null;
             }
         };
     }

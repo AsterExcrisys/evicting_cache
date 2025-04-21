@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         Cache<Integer, String> cache = CacheBuilder
                 .<Integer, String>newBuilder()
-                .evictionPolicy(EvictionPolicy.LIFO)
+                .evictionPolicy(EvictionPolicy.RANDOM)
                 .expireTime(1, TimeUnit.MINUTES)
                 .fixedCapacity(true)
                 .initialCapacity(10)

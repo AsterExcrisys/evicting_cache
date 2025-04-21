@@ -6,5 +6,9 @@ public enum EvictionPolicy {
     MRU,
     MFU,
     FIFO,
-    LIFO
+    LIFO,
+    TIME,
+    EXPIRE,
+    PRIORITY,
+    RANDOM
 }
