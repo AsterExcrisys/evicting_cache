@@ -5,7 +5,6 @@ import com.asterexcrisys.evicache.frequency.fixed.LFUCache;
 import com.asterexcrisys.evicache.frequency.fixed.MFUCache;
 import com.asterexcrisys.evicache.order.fixed.FIFOCache;
 import com.asterexcrisys.evicache.order.fixed.LIFOCache;
-
 import java.util.concurrent.TimeUnit;
 
 public class CacheBuilder<K, V> {

@@ -68,7 +68,7 @@ com.asterexcrisys.evicache
 ## 🚀 Getting Started
 
 ### 🛠 Requirements
-- Java 8 or higher
+- Java 16 or higher
 - IntelliJ IDEA (recommended for project structure)
 
 ### 🧪 Example Usage (CacheBuilder)
