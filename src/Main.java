@@ -7,9 +7,9 @@ public class Main {
     public static void main(String[] args) {
         Cache<Integer, String> cache = CacheBuilder
                 .<Integer, String>newBuilder()
-                .evictionPolicy(EvictionPolicy.MFU)
-                .fixed(true)
-                .capacity(10)
+                .evictionPolicy(EvictionPolicy.FIFO)
+                .fixedCapacity(true)
+                .initialCapacity(10)
                 .build();
         cache.put(1, "one");
         cache.put(2, "two");

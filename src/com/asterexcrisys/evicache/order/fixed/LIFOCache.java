@@ -1,11 +1,11 @@
-package com.asterexcrisys.evicache.fixed;
+package com.asterexcrisys.evicache.order.fixed;
 
 import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 @SuppressWarnings({"unused", "Duplicates"})
-public class LRUCache<K, V> implements Cache<K, V> {
+public class LIFOCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
@@ -13,7 +13,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
     private final V[] values;
 
     @SuppressWarnings("unchecked")
-    public LRUCache(int capacity) throws IllegalArgumentException {
+    public LIFOCache(int capacity) {
         if (capacity < 1) {
             throw new IllegalArgumentException("capacity cannot be zero or negative");
         }
@@ -134,10 +134,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
-            for (int i = index - 1; i >= 0; i--) {
-                keys[i + 1] = keys[i];
-                values[i + 1] = values[i];
-            }
+            values[index] = value;
         } else {
             if (size < capacity) {
                 size++;
@@ -146,9 +143,9 @@ public class LRUCache<K, V> implements Cache<K, V> {
                 keys[i + 1] = keys[i];
                 values[i + 1] = values[i];
             }
+            keys[0] = key;
+            values[0] = value;
         }
-        keys[0] = key;
-        values[0] = value;
     }
 
     public void remove(K key) throws IllegalArgumentException {
@@ -183,15 +180,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
         if (index < 0 || index > size - 1) {
             throw new IndexOutOfBoundsException("index out of bounds");
         }
-        K key = keys[index];
-        V value = values[index];
-        for (int i = index - 1; i >= 0; i--) {
-            keys[i + 1] = keys[i];
-            values[i + 1] = values[i];
-        }
-        keys[0] = key;
-        values[0] = value;
-        return value;
+        return values[index];
     }
 
     private void remove(int index) throws IndexOutOfBoundsException {
@@ -211,7 +200,7 @@ public class LRUCache<K, V> implements Cache<K, V> {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof LRUCache<?, ?> other)) {
+        if (!(object instanceof LIFOCache<?, ?> other)) {
             return false;
         }
         if (size != other.size) {

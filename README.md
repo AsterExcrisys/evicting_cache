@@ -8,25 +8,55 @@ A Java-based library that implements multiple **cache eviction strategies**, inc
 
 ```
 com.asterexcrisys.evicache
-├── fixed                 # Fixed-size cache implementations
-│   ├── LRUCache.java
-│   ├── LFUCache.java
-│   ├── MRUCache.java
-│   ├── MFUCache.java
-│   ├── FIFOCache.java
-│   └── LIFOCache.java
 │
-├── variable              # Variable-size cache implementations
-│   ├── LRUCache.java
-│   ├── LFUCache.java
-│   ├── MRUCache.java
-│   ├── MFUCache.java
-│   ├── FIFOCache.java
-│   └── LIFOCache.java
+├── access              # Access-based cache implementations                      
+│   ├── fixed                   # Fixed-size versions
+│   │   ├── LRUCache.java
+│   │   └── MRUCache.java
+│   │
+│   └── variable                # Variable-size versions
+│       ├── LRUCache.java
+│       └── MRUCache.java
 │
-├── Cache.java            # Interface that any and all caches implement
-├── CacheBuilder.java     # Self-explanatory, used to easily build caches with different eviction strategies
-└── EvictionPolicy.java   # Enumeration that contains any and all types of eviction strategies
+├── frequency           # Frequency-based cache implementations
+│   ├── fixed                   # Fixed-size versions
+│   │   ├── LFUCache.java
+│   │   └── MFUCache.java
+│   │
+│   └── variable                # Variable-size versions
+│       ├── LFUCache.java
+│       └── MFUCache.java
+│
+├── order               # Order-based cache implementations
+│   ├── fixed                   # Fixed-size versions
+│   │   ├── FIFOCache.java
+│   │   └── LIFOCache.java
+│   │
+│   └── variable                # Variable-size versions
+│       ├── FIFOCache.java
+│       └── LIFOCache.java
+│
+├── time                # Time-based cache implementations
+│   ├── fixed                   # Fixed-size versions
+│   │   ├── TimeCache.java
+│   │   └── ExpireCache.java
+│   │
+│   └── variable                # Variable-size versions
+│       ├── TimeCache.java
+│       └── ExpireCache.java
+│
+├── extra               # Extra cache implementations (Ex.: priority-based)
+│   ├── fixed                   # Fixed-size versions
+│   │   ├── PriorityCache.java
+│   │   └── RandomCache.java
+│   │
+│   └── variable                # Variable-size versions
+│       ├── PriorityCache.java
+│       └── RandomCache.java
+│
+├── Cache.java              # Interface that any and all caches implement
+├── CacheBuilder.java       # Self-explanatory, used to easily build caches with different eviction strategies
+└── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
 ```
 
 ---
@@ -43,13 +73,13 @@ com.asterexcrisys.evicache
 import com.asterexcrisys.evicache.CacheBuilder;
 
 public class Main {
-    
+
     public static void main(String[] args) {
         Cache<Integer, String> cache = CacheBuilder
                 .<Integer, String>newBuilder() // Creates a new builder, Cache<Integer, String> will be its return type in this case
                 .evictionPolicy(EvictionPolicy.LRU) // Sets the policy to use when evicting elements from the cache, only applicable to fixed-length caches
-                .fixed(true) // Tells the builder that the returned cache should be of the fixed-length version
-                .capacity(10) // Sets the initial and, in this case, total capacity to 10
+                .fixedCapacity(true) // Tells the builder that the returned cache should be of the fixed-length version
+                .initialCapacity(10) // Sets the initial and, in this case, total capacity to 10
                 .build(); // Initializes the cache with the specified parameters
 
         cache.put(1, "one");
@@ -73,10 +103,10 @@ public class Main {
         cache.get(7);
         cache.put(0, "zero"); // Evicts the least recently used element (4)
         cache.get(0);
-        
+
         System.out.println(cache);  // Displays current state of cache through the overridden toString() method
     }
-    
+
 }
 ```
 

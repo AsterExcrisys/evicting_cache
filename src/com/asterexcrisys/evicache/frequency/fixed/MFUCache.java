@@ -1,4 +1,4 @@
-package com.asterexcrisys.evicache.fixed;
+package com.asterexcrisys.evicache.frequency.fixed;
 
 import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;

@@ -1,20 +1,19 @@
-package com.asterexcrisys.evicache.fixed;
+package com.asterexcrisys.evicache.order.fixed;
 
 import com.asterexcrisys.evicache.Cache;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 @SuppressWarnings({"unused", "Duplicates"})
-public class LFUCache<K, V> implements Cache<K, V> {
+public class FIFOCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
     private final K[] keys;
     private final V[] values;
-    private final Integer[] frequencies;
 
     @SuppressWarnings("unchecked")
-    public LFUCache(int capacity) throws IllegalArgumentException {
+    public FIFOCache(int capacity) {
         if (capacity < 1) {
             throw new IllegalArgumentException("capacity cannot be zero or negative");
         }
@@ -22,7 +21,6 @@ public class LFUCache<K, V> implements Cache<K, V> {
         this.capacity = capacity;
         keys = (K[]) new Object[this.capacity];
         values = (V[]) new Object[this.capacity];
-        frequencies = new Integer[this.capacity];
         clear();
     }
 
@@ -40,10 +38,6 @@ public class LFUCache<K, V> implements Cache<K, V> {
 
     public V[] values() {
         return Arrays.copyOf(values, size);
-    }
-
-    public Integer[] frequencies() {
-        return Arrays.copyOf(frequencies, size);
     }
 
     public boolean isEmpty() {
@@ -141,16 +135,16 @@ public class LFUCache<K, V> implements Cache<K, V> {
         int index = indexOf(key);
         if (index >= 0) {
             values[index] = value;
-            frequencies[index]++;
-            sort(index);
         } else {
             if (size < capacity) {
                 size++;
             }
-            keys[size - 1] = key;
-            values[size - 1] = value;
-            frequencies[size - 1] = 1;
-            sort(size - 1);
+            for (int i = size - 2; i >= 0; i--) {
+                keys[i + 1] = keys[i];
+                values[i + 1] = values[i];
+            }
+            keys[0] = key;
+            values[0] = value;
         }
     }
 
@@ -186,10 +180,7 @@ public class LFUCache<K, V> implements Cache<K, V> {
         if (index < 0 || index > size - 1) {
             throw new IndexOutOfBoundsException("index out of bounds");
         }
-        V value = values[index];
-        frequencies[index]++;
-        sort(index);
-        return value;
+        return values[index];
     }
 
     private void remove(int index) throws IndexOutOfBoundsException {
@@ -202,42 +193,14 @@ public class LFUCache<K, V> implements Cache<K, V> {
         for (int i = index + 1; i < size + 1; i++) {
             keys[i - 1] = keys[i];
             values[i - 1] = values[i];
-            frequencies[i - 1] = frequencies[i];
         }
         keys[size] = null;
         values[size] = null;
-        frequencies[size] = null;
-    }
-
-    private void sort(int start) throws IndexOutOfBoundsException {
-        if (start < 0 || start > size - 1) {
-            throw new IndexOutOfBoundsException("index out of bounds");
-        }
-        for (int i = start; i >= 1; i--) {
-            if (frequencies[i - 1] > frequencies[i]) {
-                break;
-            }
-            swap(keys, i - 1, i);
-            swap(values, i - 1, i);
-            swap(frequencies, i - 1, i);
-        }
-    }
-
-    private static <T> void swap(T[] array, int i, int j) throws IllegalArgumentException, IndexOutOfBoundsException {
-        if (array == null) {
-            throw new IllegalArgumentException("array cannot be null");
-        }
-        if (i < 0 || j < 0 || i > array.length - 1 || j > array.length - 1) {
-            throw new IndexOutOfBoundsException();
-        }
-        T tmp = array[i];
-        array[i] = array[j];
-        array[j] = tmp;
     }
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof LFUCache<?, ?> other)) {
+        if (!(object instanceof FIFOCache<?, ?> other)) {
             return false;
         }
         if (size != other.size) {
@@ -262,7 +225,7 @@ public class LFUCache<K, V> implements Cache<K, V> {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
         for (int i = 0; i < size; i++) {
-            builder.append(String.format("%s: %s (%s)", keys[i], values[i], frequencies[i]));
+            builder.append(String.format("%s: %s", keys[i], values[i]));
             if (i < size - 1) {
                 builder.append(", ");
             }
