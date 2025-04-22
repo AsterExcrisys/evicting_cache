@@ -1,6 +1,9 @@
 package com.asterexcrisys.evicache.frequency.fixed;
 
+import com.asterexcrisys.evicache.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
+import com.asterexcrisys.evicache.CacheBuilder;
+import com.asterexcrisys.evicache.EvictionPolicy;
 import org.openjdk.jmh.annotations.*;
 import java.util.concurrent.TimeUnit;
 
@@ -13,9 +16,9 @@ public class MFUCacheBenchmark {
 
     @Setup(Level.Iteration)
     public void setup() {
-        cache = new MFUCache<>(1000);
+        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.MFU).fixedCapacity(true).initialCapacity(1000).build();
         for (int i = 0; i < 1000; i++) {
-            cache.put(i, i);
+            cache.put(new BasicCacheEntry<>(i, i));
         }
     }
 
@@ -26,7 +29,7 @@ public class MFUCacheBenchmark {
 
     @Benchmark
     public void benchmarkPutOperation() {
-        cache.put(1001, 1001);
+        cache.put(new BasicCacheEntry<>(1000, 1000));
     }
 
     @Benchmark

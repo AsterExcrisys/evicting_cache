@@ -1,6 +1,8 @@
 package com.asterexcrisys.evicache.extra.fixed;
 
+import com.asterexcrisys.evicache.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
+import com.asterexcrisys.evicache.CacheEntry;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -152,6 +154,13 @@ public class RandomCache<K, V> implements Cache<K, V> {
             keys[index] = key;
             values[index] = value;
         }
+    }
+
+    public void put(CacheEntry<K, V> entry) throws IllegalArgumentException {
+        if (!(entry instanceof BasicCacheEntry<K, V> basicEntry)) {
+            throw new IllegalArgumentException("entry must be of 'BasicCacheEntry' type");
+        }
+        put(basicEntry.key(), basicEntry.value());
     }
 
     public void remove(K key) throws IllegalArgumentException {

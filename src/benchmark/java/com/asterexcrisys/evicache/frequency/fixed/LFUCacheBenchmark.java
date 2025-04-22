@@ -1,6 +1,9 @@
 package com.asterexcrisys.evicache.frequency.fixed;
 
+import com.asterexcrisys.evicache.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
+import com.asterexcrisys.evicache.CacheBuilder;
+import com.asterexcrisys.evicache.EvictionPolicy;
 import org.openjdk.jmh.annotations.*;
 import java.util.concurrent.TimeUnit;
 
@@ -13,9 +16,9 @@ public class LFUCacheBenchmark {
 
     @Setup(Level.Iteration)
     public void setup() {
-        cache = new LFUCache<>(1000);
+        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.LFU).fixedCapacity(true).initialCapacity(1000).build();
         for (int i = 0; i < 1000; i++) {
-            cache.put(i, i);
+            cache.put(new BasicCacheEntry<>(i, i));
         }
     }
 
@@ -26,7 +29,7 @@ public class LFUCacheBenchmark {
 
     @Benchmark
     public void benchmarkPutOperation() {
-        cache.put(1001, 1001);
+        cache.put(new BasicCacheEntry<>(1000, 1000));
     }
 
     @Benchmark

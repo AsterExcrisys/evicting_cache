@@ -1,6 +1,8 @@
 package com.asterexcrisys.evicache.access.fixed;
 
+import com.asterexcrisys.evicache.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
+import com.asterexcrisys.evicache.CacheEntry;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
@@ -149,6 +151,13 @@ public class LRUCache<K, V> implements Cache<K, V> {
         }
         keys[0] = key;
         values[0] = value;
+    }
+
+    public void put(CacheEntry<K, V> entry) throws IllegalArgumentException {
+        if (!(entry instanceof BasicCacheEntry<K, V> basicEntry)) {
+            throw new IllegalArgumentException("entry must be of 'BasicCacheEntry' type");
+        }
+        put(basicEntry.key(), basicEntry.value());
     }
 
     public void remove(K key) throws IllegalArgumentException {

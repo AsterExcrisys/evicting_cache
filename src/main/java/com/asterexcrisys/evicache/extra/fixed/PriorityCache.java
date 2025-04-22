@@ -1,6 +1,8 @@
 package com.asterexcrisys.evicache.extra.fixed;
 
 import com.asterexcrisys.evicache.Cache;
+import com.asterexcrisys.evicache.CacheEntry;
+import com.asterexcrisys.evicache.PriorityCacheEntry;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
@@ -158,8 +160,11 @@ public class PriorityCache<K, V> implements Cache<K, V> {
         }
     }
 
-    public void put(K key, V value) throws IllegalArgumentException {
-        put(key, value, 0);
+    public void put(CacheEntry<K, V> entry) throws IllegalArgumentException {
+        if (!(entry instanceof PriorityCacheEntry<K, V> priorityEntry)) {
+            throw new IllegalArgumentException("entry must be of 'PriorityCacheEntry' type");
+        }
+        put(priorityEntry.key(), priorityEntry.value(), priorityEntry.priority());
     }
 
     public void remove(K key) throws IllegalArgumentException {

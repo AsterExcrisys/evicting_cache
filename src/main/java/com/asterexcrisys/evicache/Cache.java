@@ -141,11 +141,10 @@ public interface Cache<K, V> {
      * Associates the specified value with the specified key in the cache.
      * If the cache exceeds its capacity, an eviction strategy may be applied.
      *
-     * @param key the key with which the value is to be associated
-     * @param value the value to be associated with the key
+     * @param entry the key-value pair to be added/updated
      * @throws IllegalArgumentException if the key is {@code null}
      */
-    void put(K key, V value) throws IllegalArgumentException;
+    void put(CacheEntry<K, V> entry) throws IllegalArgumentException;
 
     /**
      * Removes the mapping for the specified key from the cache if present.

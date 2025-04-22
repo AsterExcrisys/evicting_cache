@@ -59,6 +59,10 @@ com.asterexcrisys.evicache
 │       └── RandomCache.java
 │
 ├── Cache.java              # Interface that any and all caches implement
+├── CacheEntry.java         # Interface that any and all cache entries implement
+├── BasicCacheEntry.java    # Cache entry used by most implementations (has only the basic 'key' and 'value' fields)
+├── PriorityCacheEntry.java # Cache entry used only by PriorityCache (has one additional 'priority' field)
+├── ExpireCacheEntry.java   # Cache entry used only by ExpireCache (has two additional 'time' and 'unit' fields)
 ├── CacheBuilder.java       # Self-explanatory, used to easily build caches with different eviction strategies
 ├── CacheRecorder.java      # Self-explanatory, used to record core metrics of any type of cache
 ├── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
@@ -91,7 +95,9 @@ com.asterexcrisys.evicache
 ### 🧪 Example Usage (CacheBuilder)
 
 ```java
+import com.asterexcrisys.evicache.BasicCacheEntry;
 import com.asterexcrisys.evicache.CacheBuilder;
+
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -105,26 +111,26 @@ public class Main {
                 .initialCapacity(10) // Sets the initial and, in this case, total capacity to 10
                 .build(); // Initializes the cache with the specified parameters
 
-        cache.put(1, "one");
-        cache.put(2, "two");
-        cache.put(3, "three");
-        cache.put(4, "four");
-        cache.put(5, "five");
+        cache.put(new BasicCacheEntry<>(1, "one"));
+        cache.put(new BasicCacheEntry<>(2, "two"));
+        cache.put(new BasicCacheEntry<>(3, "three"));
+        cache.put(new BasicCacheEntry<>(4, "four"));
+        cache.put(new BasicCacheEntry<>(5, "five"));
         cache.get(1);
         cache.get(1);
         cache.get(2);
         cache.get(3);
         cache.get(2);
-        cache.put(6, "six");
-        cache.put(7, "seven");
-        cache.put(8, "eight");
-        cache.put(9, "nine");
-        cache.put(10, "ten");
+        cache.put(new BasicCacheEntry<>(6, "six"));
+        cache.put(new BasicCacheEntry<>(7, "seven"));
+        cache.put(new BasicCacheEntry<>(8, "eight"));
+        cache.put(new BasicCacheEntry<>(9, "nine"));
+        cache.put(new BasicCacheEntry<>(10, "ten"));
         cache.get(3);
         cache.get(8);
         cache.get(8);
         cache.get(7);
-        cache.put(0, "zero"); // Evicts the least recently used element (4)
+        cache.put(new BasicCacheEntry<>(0, "zero")); // Evicts the least recently used element (4)
         cache.get(0);
 
         System.out.println(cache);  // Displays current state of cache through the overridden toString() method
