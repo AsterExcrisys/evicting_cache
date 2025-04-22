@@ -1,12 +1,14 @@
 package com.asterexcrisys.evicache;
 
-import com.asterexcrisys.evicache.access.fixed.*;
-import com.asterexcrisys.evicache.extra.fixed.PriorityCache;
-import com.asterexcrisys.evicache.extra.fixed.RandomCache;
-import com.asterexcrisys.evicache.frequency.fixed.LFUCache;
-import com.asterexcrisys.evicache.frequency.fixed.MFUCache;
-import com.asterexcrisys.evicache.order.fixed.FIFOCache;
-import com.asterexcrisys.evicache.order.fixed.LIFOCache;
+import com.asterexcrisys.evicache.maps.access.fixed.LRUCache;
+import com.asterexcrisys.evicache.maps.access.fixed.MRUCache;
+import com.asterexcrisys.evicache.maps.extra.fixed.PriorityCache;
+import com.asterexcrisys.evicache.maps.extra.fixed.RandomCache;
+import com.asterexcrisys.evicache.maps.frequency.fixed.LFUCache;
+import com.asterexcrisys.evicache.maps.frequency.fixed.MFUCache;
+import com.asterexcrisys.evicache.maps.order.fixed.FIFOCache;
+import com.asterexcrisys.evicache.maps.order.fixed.LIFOCache;
+import com.asterexcrisys.evicache.models.EvictionPolicy;
 import java.util.concurrent.TimeUnit;
 
 public class CacheBuilder<K, V> {

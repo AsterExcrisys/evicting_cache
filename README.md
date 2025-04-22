@@ -13,60 +13,70 @@ if you would like to know more about cache eviction policies and which one best 
 ```
 com.asterexcrisys.evicache
 │
-├── access              # Access-based cache implementations                      
-│   ├── fixed                   # Fixed-size versions
-│   │   ├── LRUCache.java
-│   │   └── MRUCache.java
+├── maps                # All cache maps
+│   ├── access              # Access-based cache implementations                      
+│   │   ├── fixed                   # Fixed-size versions
+│   │   │   ├── LRUCache.java
+│   │   │   └── MRUCache.java
+│   │   │
+│   │   └── variable                # Variable-size versions
+│   │       ├── LRUCache.java
+│   │       └── MRUCache.java
 │   │
-│   └── variable                # Variable-size versions
-│       ├── LRUCache.java
-│       └── MRUCache.java
+│   ├── frequency           # Frequency-based cache implementations
+│   │   ├── fixed                   # Fixed-size versions
+│   │   │   ├── LFUCache.java
+│   │   │   └── MFUCache.java
+│   │   │
+│   │   └── variable                # Variable-size versions
+│   │       ├── LFUCache.java
+│   │       └── MFUCache.java
+│   │
+│   ├── order               # Order-based cache implementations
+│   │   ├── fixed                   # Fixed-size versions
+│   │   │   ├── FIFOCache.java
+│   │   │   └── LIFOCache.java
+│   │   │
+│   │   └── variable                # Variable-size versions
+│   │       ├── FIFOCache.java
+│   │       └── LIFOCache.java
+│   │
+│   ├── time                # Time-based cache implementations
+│   │   ├── fixed                   # Fixed-size versions
+│   │   │   ├── TimeCache.java
+│   │   │   └── ExpireCache.java
+│   │   │
+│   │   └── variable                # Variable-size versions
+│   │       ├── TimeCache.java
+│   │       └── ExpireCache.java
+│   │
+│   └── extra               # Extra cache implementations (e.g priority-based or random-based)
+│       ├── fixed                   # Fixed-size versions
+│       │   ├── PriorityCache.java
+│       │   └── RandomCache.java
+│       │
+│       └── variable                # Variable-size versions
+│           ├── PriorityCache.java
+│           └── RandomCache.java
 │
-├── frequency           # Frequency-based cache implementations
-│   ├── fixed                   # Fixed-size versions
-│   │   ├── LFUCache.java
-│   │   └── MFUCache.java
-│   │
-│   └── variable                # Variable-size versions
-│       ├── LFUCache.java
-│       └── MFUCache.java
+├── entries                     # All cache entries
+│   ├── BasicCacheEntry.java        # Cache entry used by most implementations (has only the basic 'key' and 'value' fields)
+│   ├── PriorityCacheEntry.java     # Cache entry used only by PriorityCache (has one additional 'priority' field)
+│   └── ExpireCacheEntry.java       # Cache entry used only by ExpireCache (has two additional 'time' and 'unit' fields)
 │
-├── order               # Order-based cache implementations
-│   ├── fixed                   # Fixed-size versions
-│   │   ├── FIFOCache.java
-│   │   └── LIFOCache.java
-│   │
-│   └── variable                # Variable-size versions
-│       ├── FIFOCache.java
-│       └── LIFOCache.java
+├── models                  # All cache-related models
+│   ├── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
+│   └── MetricType.java         # Enumeration that contains any and all types of metrics recorded by CacheRecorder
 │
-├── time                # Time-based cache implementations
-│   ├── fixed                   # Fixed-size versions
-│   │   ├── TimeCache.java
-│   │   └── ExpireCache.java
-│   │
-│   └── variable                # Variable-size versions
-│       ├── TimeCache.java
-│       └── ExpireCache.java
-│
-├── extra               # Extra cache implementations (e.g priority-based or random-based)
-│   ├── fixed                   # Fixed-size versions
-│   │   ├── PriorityCache.java
-│   │   └── RandomCache.java
-│   │
-│   └── variable                # Variable-size versions
-│       ├── PriorityCache.java
-│       └── RandomCache.java
+├── exceptions              # All cache-related exceptions
+│   ├── IllegalCacheStateException.java
+│   ├── InvalidCacheKeyException.java
+│   └── CacheUnderflowException.java
 │
 ├── Cache.java              # Interface that any and all caches implement
 ├── CacheEntry.java         # Interface that any and all cache entries implement
-├── BasicCacheEntry.java    # Cache entry used by most implementations (has only the basic 'key' and 'value' fields)
-├── PriorityCacheEntry.java # Cache entry used only by PriorityCache (has one additional 'priority' field)
-├── ExpireCacheEntry.java   # Cache entry used only by ExpireCache (has two additional 'time' and 'unit' fields)
 ├── CacheBuilder.java       # Self-explanatory, used to easily build caches with different eviction strategies
-├── CacheRecorder.java      # Self-explanatory, used to record core metrics of any type of cache
-├── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
-└── MetricType.java         # Enumeration that contains any and all types of metrics recorded by CacheRecorder
+└── CacheRecorder.java      # Self-explanatory, used to record core metrics of any type of cache
 ```
 
 ---
@@ -95,7 +105,7 @@ com.asterexcrisys.evicache
 ### 🧪 Example Usage (CacheBuilder)
 
 ```java
-import com.asterexcrisys.evicache.BasicCacheEntry;
+import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.CacheBuilder;
 import java.util.concurrent.TimeUnit;
 

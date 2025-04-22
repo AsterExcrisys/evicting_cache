@@ -1,6 +1,6 @@
 package com.asterexcrisys.evicache.frequency.fixed.jmh_generated;
-import com.asterexcrisys.evicache.frequency.fixed.LFUCacheBenchmark;
-public class LFUCacheBenchmark_jmhType_B1 extends com.asterexcrisys.evicache.frequency.fixed.LFUCacheBenchmark {
+import com.asterexcrisys.evicache.maps.frequency.fixed.LFUCacheBenchmark;
+public class LFUCacheBenchmark_jmhType_B1 extends LFUCacheBenchmark {
     byte b1_000, b1_001, b1_002, b1_003, b1_004, b1_005, b1_006, b1_007, b1_008, b1_009, b1_010, b1_011, b1_012, b1_013, b1_014, b1_015;
     byte b1_016, b1_017, b1_018, b1_019, b1_020, b1_021, b1_022, b1_023, b1_024, b1_025, b1_026, b1_027, b1_028, b1_029, b1_030, b1_031;
     byte b1_032, b1_033, b1_034, b1_035, b1_036, b1_037, b1_038, b1_039, b1_040, b1_041, b1_042, b1_043, b1_044, b1_045, b1_046, b1_047;

@@ -1,6 +1,8 @@
 package com.asterexcrisys.evicache;
 
-import java.util.NoSuchElementException;
+import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
+import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
+import com.asterexcrisys.evicache.exceptions.InvalidCacheKeyException;
 
 /**
  * A generic cache interface that supports retrieval, insertion, and removal of elements
@@ -76,17 +78,17 @@ public interface Cache<K, V> {
      * Retrieves the value at the top of the cache without removing it.
      *
      * @return the top value
-     * @throws NoSuchElementException if the cache is empty
+     * @throws CacheUnderflowException if the cache is empty
      */
-    V elementTop() throws NoSuchElementException;
+    V elementTop() throws CacheUnderflowException;
 
     /**
      * Retrieves the value at the bottom of the cache without removing it.
      *
      * @return the bottom value
-     * @throws NoSuchElementException if the cache is empty
+     * @throws CacheUnderflowException if the cache is empty
      */
-    V elementBottom() throws NoSuchElementException;
+    V elementBottom() throws CacheUnderflowException;
 
     /**
      * Removes and returns the value at the top of the cache.
@@ -106,26 +108,26 @@ public interface Cache<K, V> {
      * Removes and returns the value at the top of the cache.
      *
      * @return the removed top value
-     * @throws NoSuchElementException if the cache is empty
+     * @throws CacheUnderflowException if the cache is empty
      */
-    V pollTop() throws NoSuchElementException;
+    V pollTop() throws CacheUnderflowException;
 
     /**
      * Removes and returns the value at the bottom of the cache.
      *
      * @return the removed bottom value
-     * @throws NoSuchElementException if the cache is empty
+     * @throws CacheUnderflowException if the cache is empty
      */
-    V pollBottom() throws NoSuchElementException;
+    V pollBottom() throws CacheUnderflowException;
 
     /**
      * Retrieves the value associated with the specified key.
      *
      * @param key the key whose associated value is to be returned
      * @return the value mapped to the key, or {@code null} if they key is not present
-     * @throws IllegalArgumentException if the key is {@code null}
+     * @throws InvalidCacheKeyException if the key is {@code null}
      */
-    V get(K key) throws IllegalArgumentException;
+    V get(K key) throws InvalidCacheKeyException;
 
     /**
      * Retrieves the value associated with the specified key, or returns the default value if the key is not found.
@@ -133,26 +135,27 @@ public interface Cache<K, V> {
      * @param key the key whose associated value is to be returned
      * @param defaultValue the value to return if the key is not found
      * @return the value mapped to the key, or {@code defaultValue} if the key is not present
-     * @throws IllegalArgumentException if the key is {@code null}
+     * @throws InvalidCacheKeyException if the key is {@code null}
      */
-    V get(K key, V defaultValue) throws IllegalArgumentException;
+    V get(K key, V defaultValue) throws InvalidCacheKeyException;
 
     /**
      * Associates the specified value with the specified key in the cache.
      * If the cache exceeds its capacity, an eviction strategy may be applied.
      *
      * @param entry the key-value pair to be added/updated
-     * @throws IllegalArgumentException if the key is {@code null}
+     * @throws IllegalCacheStateException if the entry is not of the correct type for the cache
+     * @throws InvalidCacheKeyException if the key is {@code null}
      */
-    void put(CacheEntry<K, V> entry) throws IllegalArgumentException;
+    void put(CacheEntry<K, V> entry) throws IllegalCacheStateException, InvalidCacheKeyException;
 
     /**
      * Removes the mapping for the specified key from the cache if present.
      *
      * @param key the key whose mapping is to be removed
-     * @throws IllegalArgumentException if the key is {@code null}
+     * @throws InvalidCacheKeyException if the key is {@code null}
      */
-    void remove(K key) throws IllegalArgumentException;
+    void remove(K key) throws InvalidCacheKeyException;
 
     /**
      * Removes all entries from the cache.

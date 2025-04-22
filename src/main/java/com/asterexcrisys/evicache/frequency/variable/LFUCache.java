@@ -1,5 +1,0 @@
-package com.asterexcrisys.evicache.frequency.variable;
-
-public class LFUCache {
-
-}

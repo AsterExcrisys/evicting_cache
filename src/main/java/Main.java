@@ -1,7 +1,7 @@
-import com.asterexcrisys.evicache.BasicCacheEntry;
+import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheBuilder;
-import com.asterexcrisys.evicache.EvictionPolicy;
+import com.asterexcrisys.evicache.models.EvictionPolicy;
 import java.util.concurrent.TimeUnit;
 
 public class Main {

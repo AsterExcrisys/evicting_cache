@@ -1,5 +1,6 @@
 package com.asterexcrisys.evicache;
 
+import com.asterexcrisys.evicache.models.MetricType;
 import java.util.HashMap;
 
 public class CacheRecorder {
