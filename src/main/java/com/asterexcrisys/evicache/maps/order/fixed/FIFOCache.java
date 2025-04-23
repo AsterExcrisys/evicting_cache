@@ -5,7 +5,7 @@ import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheEntry;
 import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
 import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
-import com.asterexcrisys.evicache.exceptions.InvalidCacheKeyException;
+import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
 import java.util.Arrays;
 
 @SuppressWarnings({"unused", "Duplicates"})
@@ -116,9 +116,9 @@ public class FIFOCache<K, V> implements Cache<K, V> {
         return bottom;
     }
 
-    public V get(K key) throws InvalidCacheKeyException {
+    public V get(K key) throws InvalidCacheEntryException {
         if (key == null) {
-            throw new InvalidCacheKeyException("key cannot be null");
+            throw new InvalidCacheEntryException("key cannot be null");
         }
         int index = indexOf(key);
         if (index >= 0) {
@@ -127,14 +127,14 @@ public class FIFOCache<K, V> implements Cache<K, V> {
         return null;
     }
 
-    public V get(K key, V defaultValue) throws InvalidCacheKeyException {
+    public V get(K key, V defaultValue) throws InvalidCacheEntryException {
         V value = get(key);
         return value == null? defaultValue:value;
     }
 
-    public void put(K key, V value) throws InvalidCacheKeyException {
+    public void put(K key, V value) throws InvalidCacheEntryException {
         if (key == null) {
-            throw new InvalidCacheKeyException("key cannot be null");
+            throw new InvalidCacheEntryException("key cannot be null");
         }
         int index = indexOf(key);
         if (index >= 0) {
@@ -152,16 +152,16 @@ public class FIFOCache<K, V> implements Cache<K, V> {
         }
     }
 
-    public void put(CacheEntry<K, V> entry) throws IllegalCacheStateException, InvalidCacheKeyException {
+    public void put(CacheEntry<K, V> entry) throws IllegalCacheStateException, InvalidCacheEntryException {
         if (!(entry instanceof BasicCacheEntry<K, V> basicEntry)) {
             throw new IllegalCacheStateException("entry must be of 'BasicCacheEntry' type");
         }
         put(basicEntry.key(), basicEntry.value());
     }
 
-    public void remove(K key) throws InvalidCacheKeyException {
+    public void remove(K key) throws InvalidCacheEntryException {
         if (key == null) {
-            throw new InvalidCacheKeyException("key cannot be null");
+            throw new InvalidCacheEntryException("key cannot be null");
         }
         int index = indexOf(key);
         if (index >= 0) {
@@ -175,9 +175,9 @@ public class FIFOCache<K, V> implements Cache<K, V> {
         size = 0;
     }
 
-    private int indexOf(K key) throws InvalidCacheKeyException {
+    private int indexOf(K key) throws InvalidCacheEntryException {
         if (key == null) {
-            throw new InvalidCacheKeyException("key cannot be null");
+            throw new InvalidCacheEntryException("key cannot be null");
         }
         for (int i = 0; i < size; i++) {
             if (keys[i] != null && keys[i].equals(key)) {

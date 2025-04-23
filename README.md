@@ -65,7 +65,8 @@ com.asterexcrisys.evicache
 │   └── ExpireCacheEntry.java       # Cache entry used only by ExpireCache (has two additional 'time' and 'unit' fields)
 │
 ├── models                  # All cache-related models
-│   ├── EvictionPolicy.java     # Enumeration that contains any and all types of eviction strategies
+│   ├── EvictionPolicy.java     # Enumeration that contains any and all policies of eviction
+│   ├── ExpireMode.java         # Enumeration that contains any and all modes of expire (only used by TimeCache and ExpireCache)
 │   └── MetricType.java         # Enumeration that contains any and all types of metrics recorded by CacheRecorder
 │
 ├── exceptions              # All cache-related exceptions
@@ -107,6 +108,7 @@ com.asterexcrisys.evicache
 ```java
 import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.CacheBuilder;
+import com.asterexcrisys.evicache.models.ExpireMode;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -116,8 +118,10 @@ public class Main {
                 .<Integer, String>newBuilder() // Creates a new builder, Cache<Integer, String> will be its return type in this case
                 .evictionPolicy(EvictionPolicy.LRU) // Sets the policy to use when evicting elements from the cache, only applicable to fixed-length caches
                 .expireTime(1, TimeUnit.MINUTES) // Sets the expiry time of all elements to 1 minute, only applicable to time-based caches
-                .fixedCapacity(true) // Tells the builder that the returned cache should be of the fixed-length version
+                .expireMode(ExpireMode.AFTER_ACCESS)  // Sets the expiry mode to 'after access', meaning the timer of an element will reset after every valid access to it, only applicable to time-based caches
                 .initialCapacity(10) // Sets the initial and, in this case, total capacity to 10
+                .fixedCapacity(true) // Tells the builder that the returned cache should be of the fixed-length version
+                .enabledMetrics(true) // Tells the cache to register metrics such as hits and misses (and many others), which can be retrieved through the metrics() method
                 .build(); // Initializes the cache with the specified parameters
 
         cache.put(new BasicCacheEntry<>(1, "one"));
@@ -167,13 +171,29 @@ public class Main {
 
 ---
 
+## 🧪 Registrable Metrics
+
+| Metric        | Description                                                                                                      |
+|---------------|------------------------------------------------------------------------------------------------------------------|
+| **Hit**       | A hit is any access operation that results in a success (key found)                                              |
+| **Miss**      | A miss is any access operation that results in a failure (key not found or expired)                              |
+| **Puts**      | A put is an operation where an element is either added to the cache or updated                                   |
+| **Removes**   | A remove is an operation where an element is removed from the cache                                              |
+| **Evictions** | An eviction is an automatic operation that happens whenever trying to add<br/>an element to a cache that is full |
+| **Clears**    | A clear is an operation where all entries are removed from the cache                                             |
+| **Size**      | Self-explanatory, returns the current size (or number of entries) of the cache                                   |
+| **Capacity**  | Self-explanatory, returns the current capacity (or total occupied space) of the cache                            |
+
+---
+
 ## 📈 Future Improvements
 - ✅ Provide extensive documentation (both via Javadoc and GitHub Wikis)
 - ⏳ Add thread-safe versions
 - ⏳ Add serialization support
 - ⏳ Add iterator support
 - ⏳ Add benchmark performance for each strategy
-- ⏳ Add FIFO, LIFO, Time/Expire, and Random eviction strategies
+- ⏳ Add variable-capacity versions of all current cache implementations
+- ⏳ Add metrics support
 
 ---
 

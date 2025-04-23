@@ -8,23 +8,31 @@ import com.asterexcrisys.evicache.maps.frequency.fixed.LFUCache;
 import com.asterexcrisys.evicache.maps.frequency.fixed.MFUCache;
 import com.asterexcrisys.evicache.maps.order.fixed.FIFOCache;
 import com.asterexcrisys.evicache.maps.order.fixed.LIFOCache;
+import com.asterexcrisys.evicache.maps.time.fixed.ExpireCache;
+import com.asterexcrisys.evicache.maps.time.fixed.TimeCache;
 import com.asterexcrisys.evicache.models.EvictionPolicy;
+import com.asterexcrisys.evicache.models.ExpireMode;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("unused")
 public class CacheBuilder<K, V> {
 
     private EvictionPolicy policy;
     private long time;
     private TimeUnit unit;
-    private boolean isFixed;
+    private ExpireMode mode;
     private int capacity;
+    private boolean isFixed;
+    private boolean isEnabled;
 
     private CacheBuilder() {
         policy = EvictionPolicy.LRU;
         time = 10L;
         unit = TimeUnit.MINUTES;
-        isFixed = true;
+        mode = ExpireMode.AFTER_WRITE;
         capacity = 100;
+        isFixed = true;
+        isEnabled = false;
     }
 
     public CacheBuilder<K, V> evictionPolicy(EvictionPolicy policy) throws IllegalArgumentException {
@@ -47,8 +55,11 @@ public class CacheBuilder<K, V> {
         return this;
     }
 
-    public CacheBuilder<K, V> fixedCapacity(boolean isFixed) {
-        this.isFixed = isFixed;
+    public CacheBuilder<K, V> expireMode(ExpireMode mode) throws IllegalArgumentException {
+        if (mode == null) {
+            throw new IllegalArgumentException("mode cannot be null");
+        }
+        this.mode = mode;
         return this;
     }
 
@@ -57,6 +68,16 @@ public class CacheBuilder<K, V> {
             throw new IllegalArgumentException("capacity cannot be zero or negative");
         }
         this.capacity = capacity;
+        return this;
+    }
+
+    public CacheBuilder<K, V> fixedCapacity(boolean isFixed) {
+        this.isFixed = isFixed;
+        return this;
+    }
+
+    public CacheBuilder<K, V> enabledMetrics(boolean isEnabled) {
+        this.isEnabled = isEnabled;
         return this;
     }
 
@@ -100,13 +121,13 @@ public class CacheBuilder<K, V> {
             }
             case TIME -> {
                 if (isFixed) {
-                    yield null;
+                    yield new TimeCache<>(capacity, time, unit, mode);
                 }
                 yield null;
             }
             case EXPIRE -> {
                 if (isFixed) {
-                    yield null;
+                    yield new ExpireCache<>(capacity, mode);
                 }
                 yield null;
             }

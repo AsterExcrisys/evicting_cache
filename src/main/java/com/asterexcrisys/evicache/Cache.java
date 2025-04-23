@@ -2,7 +2,7 @@ package com.asterexcrisys.evicache;
 
 import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
 import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
-import com.asterexcrisys.evicache.exceptions.InvalidCacheKeyException;
+import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
 
 /**
  * A generic cache interface that supports retrieval, insertion, and removal of elements
@@ -125,9 +125,9 @@ public interface Cache<K, V> {
      *
      * @param key the key whose associated value is to be returned
      * @return the value mapped to the key, or {@code null} if they key is not present
-     * @throws InvalidCacheKeyException if the key is {@code null}
+     * @throws InvalidCacheEntryException if the key is {@code null}
      */
-    V get(K key) throws InvalidCacheKeyException;
+    V get(K key) throws InvalidCacheEntryException;
 
     /**
      * Retrieves the value associated with the specified key, or returns the default value if the key is not found.
@@ -135,9 +135,9 @@ public interface Cache<K, V> {
      * @param key the key whose associated value is to be returned
      * @param defaultValue the value to return if the key is not found
      * @return the value mapped to the key, or {@code defaultValue} if the key is not present
-     * @throws InvalidCacheKeyException if the key is {@code null}
+     * @throws InvalidCacheEntryException if the key is {@code null}
      */
-    V get(K key, V defaultValue) throws InvalidCacheKeyException;
+    V get(K key, V defaultValue) throws InvalidCacheEntryException;
 
     /**
      * Associates the specified value with the specified key in the cache.
@@ -145,17 +145,17 @@ public interface Cache<K, V> {
      *
      * @param entry the key-value pair to be added/updated
      * @throws IllegalCacheStateException if the entry is not of the correct type for the cache
-     * @throws InvalidCacheKeyException if the key is {@code null}
+     * @throws InvalidCacheEntryException if the key is {@code null}
      */
-    void put(CacheEntry<K, V> entry) throws IllegalCacheStateException, InvalidCacheKeyException;
+    void put(CacheEntry<K, V> entry) throws IllegalCacheStateException, InvalidCacheEntryException;
 
     /**
      * Removes the mapping for the specified key from the cache if present.
      *
      * @param key the key whose mapping is to be removed
-     * @throws InvalidCacheKeyException if the key is {@code null}
+     * @throws InvalidCacheEntryException if the key is {@code null}
      */
-    void remove(K key) throws InvalidCacheKeyException;
+    void remove(K key) throws InvalidCacheEntryException;
 
     /**
      * Removes all entries from the cache.
