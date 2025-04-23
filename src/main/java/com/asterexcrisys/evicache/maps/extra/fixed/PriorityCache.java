@@ -2,31 +2,37 @@ package com.asterexcrisys.evicache.maps.extra.fixed;
 
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheEntry;
+import com.asterexcrisys.evicache.CacheRecorder;
 import com.asterexcrisys.evicache.entries.PriorityCacheEntry;
 import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
 import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
 import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 @SuppressWarnings({"unused", "Duplicates"})
 public class PriorityCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
+    private final boolean metricsEnabled;
     private final K[] keys;
     private final V[] values;
     private final Integer[] priorities;
+    private final CacheRecorder recorder;
 
     @SuppressWarnings("unchecked")
-    public PriorityCache(int capacity) throws IllegalCacheStateException {
+    public PriorityCache(int capacity, boolean metricsEnabled) throws IllegalCacheStateException {
         if (capacity < 1) {
             throw new IllegalCacheStateException("capacity cannot be zero or negative");
         }
         size = 0;
         this.capacity = capacity;
+        this.metricsEnabled = metricsEnabled;
         keys = (K[]) new Object[this.capacity];
         values = (V[]) new Object[this.capacity];
         priorities = new Integer[this.capacity];
+        recorder = this.metricsEnabled? new CacheRecorder((Class<? extends Cache<?, ?>>) this.getClass()):null;
         clear();
     }
 
@@ -38,12 +44,25 @@ public class PriorityCache<K, V> implements Cache<K, V> {
         return capacity;
     }
 
+    public boolean metricsEnabled() {
+        return metricsEnabled;
+    }
+
     public K[] keys() {
         return Arrays.copyOf(keys, size);
     }
 
     public V[] values() {
         return Arrays.copyOf(values, size);
+    }
+
+    public HashMap<String, Integer> metrics() throws IllegalCacheStateException {
+        if (!metricsEnabled) {
+            throw new IllegalCacheStateException("metrics are not enabled and therefore were not registered");
+        }
+        recorder.size(size);
+        recorder.capacity(capacity);
+        return recorder.metrics();
     }
 
     public Integer[] priorities() {
@@ -128,7 +147,13 @@ public class PriorityCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             return get(index);
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
         return null;
     }
@@ -145,8 +170,14 @@ public class PriorityCache<K, V> implements Cache<K, V> {
         if (priority == null) {
             throw new InvalidCacheEntryException("priority cannot be null");
         }
+        if (metricsEnabled) {
+            recorder.put();
+        }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             values[index] = value;
             priorities[index] = priority;
             sort(index);
@@ -156,6 +187,9 @@ public class PriorityCache<K, V> implements Cache<K, V> {
             } else {
                 if (priorities[size - 1] >= priority) {
                     return;
+                }
+                if (metricsEnabled) {
+                    recorder.eviction();
                 }
             }
             keys[size - 1] = key;
@@ -178,11 +212,22 @@ public class PriorityCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+                recorder.remove();
+            }
             remove(index);
+            return;
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
     }
 
     public void clear() {
+        if (metricsEnabled) {
+            recorder.clear();
+        }
         Arrays.fill(keys, null);
         Arrays.fill(values, null);
         Arrays.fill(priorities, null);

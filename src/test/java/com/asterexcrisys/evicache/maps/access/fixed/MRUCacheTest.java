@@ -15,7 +15,7 @@ public class MRUCacheTest {
 
     @BeforeEach
     public void setUp() {
-        cache = CacheBuilder.<String, Integer>newBuilder().evictionPolicy(EvictionPolicy.MRU).fixedCapacity(true).initialCapacity(5).build();
+        cache = CacheBuilder.<String, Integer>newBuilder().evictionPolicy(EvictionPolicy.MRU).capacityFixed(true).initialCapacity(5).build();
     }
 
     @Test

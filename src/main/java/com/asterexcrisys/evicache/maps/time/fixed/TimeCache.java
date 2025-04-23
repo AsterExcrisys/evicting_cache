@@ -1,5 +1,6 @@
 package com.asterexcrisys.evicache.maps.time.fixed;
 
+import com.asterexcrisys.evicache.CacheRecorder;
 import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheEntry;
@@ -9,6 +10,7 @@ import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
 import com.asterexcrisys.evicache.models.ExpireMode;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"unused", "Duplicates"})
@@ -16,14 +18,16 @@ public class TimeCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
+    private final boolean metricsEnabled;
     private final long time;
     private final ExpireMode mode;
     private final K[] keys;
     private final V[] values;
     private final Long[] timestamps;
+    private final CacheRecorder recorder;
 
     @SuppressWarnings("unchecked")
-    public TimeCache(int capacity, long time, TimeUnit unit, ExpireMode mode) throws IllegalCacheStateException {
+    public TimeCache(int capacity, boolean metricsEnabled, long time, TimeUnit unit, ExpireMode mode) throws IllegalCacheStateException {
         if (capacity < 1) {
             throw new IllegalCacheStateException("capacity cannot be zero or negative");
         }
@@ -38,11 +42,13 @@ public class TimeCache<K, V> implements Cache<K, V> {
         }
         size = 0;
         this.capacity = capacity;
+        this.metricsEnabled = metricsEnabled;
         this.time = unit.toMillis(time);
         this.mode = mode;
         keys = (K[]) new Object[this.capacity];
         values = (V[]) new Object[this.capacity];
         timestamps = new Long[this.capacity];
+        recorder = this.metricsEnabled? new CacheRecorder((Class<? extends Cache<?, ?>>) this.getClass()):null;
         clear();
     }
 
@@ -52,6 +58,10 @@ public class TimeCache<K, V> implements Cache<K, V> {
 
     public int capacity() {
         return capacity;
+    }
+
+    public boolean metricsEnabled() {
+        return metricsEnabled;
     }
 
     public long time() {
@@ -72,6 +82,15 @@ public class TimeCache<K, V> implements Cache<K, V> {
 
     public Long[] timestamps() {
         return Arrays.copyOf(timestamps, size);
+    }
+
+    public HashMap<String, Integer> metrics() throws IllegalCacheStateException {
+        if (!metricsEnabled) {
+            throw new IllegalCacheStateException("metrics are not enabled and therefore were not registered");
+        }
+        recorder.size(size);
+        recorder.capacity(capacity);
+        return recorder.metrics();
     }
 
     public boolean isEmpty() {
@@ -153,10 +172,19 @@ public class TimeCache<K, V> implements Cache<K, V> {
         int index = indexOf(key);
         if (index >= 0) {
             if (timestamps[index] > Instant.now().toEpochMilli()) {
+                if (metricsEnabled) {
+                    recorder.miss();
+                }
                 remove(index);
                 return null;
             }
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             return get(index);
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
         return null;
     }
@@ -170,8 +198,14 @@ public class TimeCache<K, V> implements Cache<K, V> {
         if (key == null) {
             throw new InvalidCacheEntryException("key cannot be null");
         }
+        if (metricsEnabled) {
+            recorder.put();
+        }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             values[index] = value;
             if (timestamps[index] > Instant.now().toEpochMilli() || mode == ExpireMode.AFTER_ACCESS || mode == ExpireMode.AFTER_UPDATE) {
                 for (int i = index - 1; i >= 0; i--) {
@@ -186,6 +220,10 @@ public class TimeCache<K, V> implements Cache<K, V> {
         } else {
             if (size < capacity) {
                 size++;
+            } else {
+                if (metricsEnabled) {
+                    recorder.eviction();
+                }
             }
             for (int i = size - 2; i >= 0; i--) {
                 keys[i + 1] = keys[i];
@@ -211,11 +249,22 @@ public class TimeCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+                recorder.remove();
+            }
             remove(index);
+            return;
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
     }
 
     public void clear() {
+        if (metricsEnabled) {
+            recorder.clear();
+        }
         Arrays.fill(keys, null);
         Arrays.fill(values, null);
         Arrays.fill(timestamps, null);

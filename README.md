@@ -120,8 +120,8 @@ public class Main {
                 .expireTime(1, TimeUnit.MINUTES) // Sets the expiry time of all elements to 1 minute, only applicable to time-based caches
                 .expireMode(ExpireMode.AFTER_ACCESS)  // Sets the expiry mode to 'after access', meaning the timer of an element will reset after every valid access to it, only applicable to time-based caches
                 .initialCapacity(10) // Sets the initial and, in this case, total capacity to 10
-                .fixedCapacity(true) // Tells the builder that the returned cache should be of the fixed-length version
-                .enabledMetrics(true) // Tells the cache to register metrics such as hits and misses (and many others), which can be retrieved through the metrics() method
+                .capacityFixed(true) // Tells the builder that the returned cache should be of the fixed-length version
+                .metricsEnabled(true) // Tells the cache to register metrics such as hits and misses (and many others), which can be retrieved through the metrics() method
                 .build(); // Initializes the cache with the specified parameters
 
         cache.put(new BasicCacheEntry<>(1, "one"));
@@ -146,7 +146,8 @@ public class Main {
         cache.put(new BasicCacheEntry<>(0, "zero")); // Evicts the least recently used element (4)
         cache.get(0);
 
-        System.out.println(cache);  // Displays current state of cache through the overridden toString() method
+        System.out.println(cache); // Displays current state of cache through the overridden toString() method
+        System.out.println(cache.metrics()); // Displays all cache metrics registered up until now (only possible because I enabled the metrics feature in the builder)
     }
 
 }

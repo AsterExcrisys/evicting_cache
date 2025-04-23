@@ -3,6 +3,7 @@ package com.asterexcrisys.evicache;
 import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
 import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
 import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
+import java.util.HashMap;
 
 /**
  * A generic cache interface that supports retrieval, insertion, and removal of elements
@@ -30,6 +31,13 @@ public interface Cache<K, V> {
     int capacity();
 
     /**
+     * Indicates whether the cache is currently configured to register and report metrics.
+     *
+     * @return {@code true} if metrics collection is enabled, otherwise {@code false}
+     */
+    boolean metricsEnabled();
+
+    /**
      * Returns an array of the keys currently in the cache.
      *
      * @return an array containing all keys in the cache
@@ -42,6 +50,16 @@ public interface Cache<K, V> {
      * @return an array containing all values in the cache
      */
     V[] values();
+
+    /**
+     * Returns a map of internal metrics related to the cache's performance or state.
+     * This may include statistics such as hit count, miss count, eviction count, or other
+     * implementation-specific indicators.
+     *
+     * @return a map containing metric names as keys and their corresponding values
+     * @throws IllegalCacheStateException if the cache is not set to register metrics (not enabled)
+     */
+    HashMap<String, Integer> metrics() throws IllegalCacheStateException;
 
     /**
      * Checks if the cache is empty.

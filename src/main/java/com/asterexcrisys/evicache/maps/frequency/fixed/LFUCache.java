@@ -1,5 +1,6 @@
 package com.asterexcrisys.evicache.maps.frequency.fixed;
 
+import com.asterexcrisys.evicache.CacheRecorder;
 import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheEntry;
@@ -7,26 +8,31 @@ import com.asterexcrisys.evicache.exceptions.CacheUnderflowException;
 import com.asterexcrisys.evicache.exceptions.IllegalCacheStateException;
 import com.asterexcrisys.evicache.exceptions.InvalidCacheEntryException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 @SuppressWarnings({"unused", "Duplicates"})
 public class LFUCache<K, V> implements Cache<K, V> {
 
     private int size;
     private final int capacity;
+    private final boolean metricsEnabled;
     private final K[] keys;
     private final V[] values;
     private final Integer[] frequencies;
+    private final CacheRecorder recorder;
 
     @SuppressWarnings("unchecked")
-    public LFUCache(int capacity) throws IllegalCacheStateException {
+    public LFUCache(int capacity, boolean metricsEnabled) throws IllegalCacheStateException {
         if (capacity < 1) {
             throw new IllegalCacheStateException("capacity cannot be zero or negative");
         }
         size = 0;
         this.capacity = capacity;
+        this.metricsEnabled = metricsEnabled;
         keys = (K[]) new Object[this.capacity];
         values = (V[]) new Object[this.capacity];
         frequencies = new Integer[this.capacity];
+        recorder = this.metricsEnabled? new CacheRecorder((Class<? extends Cache<?, ?>>) this.getClass()):null;
         clear();
     }
 
@@ -36,6 +42,10 @@ public class LFUCache<K, V> implements Cache<K, V> {
 
     public int capacity() {
         return capacity;
+    }
+
+    public boolean metricsEnabled() {
+        return metricsEnabled;
     }
 
     public K[] keys() {
@@ -48,6 +58,15 @@ public class LFUCache<K, V> implements Cache<K, V> {
 
     public Integer[] frequencies() {
         return Arrays.copyOf(frequencies, size);
+    }
+
+    public HashMap<String, Integer> metrics() throws IllegalCacheStateException {
+        if (!metricsEnabled) {
+            throw new IllegalCacheStateException("metrics are not enabled and therefore were not registered");
+        }
+        recorder.size(size);
+        recorder.capacity(capacity);
+        return recorder.metrics();
     }
 
     public boolean isEmpty() {
@@ -128,7 +147,13 @@ public class LFUCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             return get(index);
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
         return null;
     }
@@ -142,14 +167,24 @@ public class LFUCache<K, V> implements Cache<K, V> {
         if (key == null) {
             throw new InvalidCacheEntryException("key cannot be null");
         }
+        if (metricsEnabled) {
+            recorder.put();
+        }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+            }
             values[index] = value;
             frequencies[index]++;
             sort(index);
         } else {
             if (size < capacity) {
                 size++;
+            } else {
+                if (metricsEnabled) {
+                    recorder.eviction();
+                }
             }
             keys[size - 1] = key;
             values[size - 1] = value;
@@ -171,11 +206,22 @@ public class LFUCache<K, V> implements Cache<K, V> {
         }
         int index = indexOf(key);
         if (index >= 0) {
+            if (metricsEnabled) {
+                recorder.hit();
+                recorder.remove();
+            }
             remove(index);
+            return;
+        }
+        if (metricsEnabled) {
+            recorder.miss();
         }
     }
 
     public void clear() {
+        if (metricsEnabled) {
+            recorder.clear();
+        }
         Arrays.fill(keys, null);
         Arrays.fill(values, null);
         Arrays.fill(frequencies, null);

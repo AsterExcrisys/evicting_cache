@@ -2,6 +2,7 @@ package com.asterexcrisys.evicache.models;
 
 public enum MetricType {
 
+    CACHE_TYPE("type"),
     CACHE_HITS("hits"),
     CACHE_MISSES("misses"),
     CACHE_PUTS("puts"),

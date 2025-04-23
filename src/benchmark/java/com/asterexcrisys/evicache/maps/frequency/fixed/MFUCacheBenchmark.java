@@ -16,7 +16,7 @@ public class MFUCacheBenchmark {
 
     @Setup(Level.Iteration)
     public void setup() {
-        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.MFU).fixedCapacity(true).initialCapacity(1000).build();
+        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.MFU).capacityFixed(true).initialCapacity(1000).build();
         for (int i = 0; i < 1000; i++) {
             cache.put(new BasicCacheEntry<>(i, i));
         }

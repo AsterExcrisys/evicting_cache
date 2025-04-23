@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class CacheRecorder {
 
+    private final Class<? extends Cache<?, ?>> cacheType;
     private int cacheHits;
     private int cacheMisses;
     private int cachePuts;
@@ -14,7 +15,8 @@ public class CacheRecorder {
     private int cacheSize;
     private int cacheCapacity;
     
-    public CacheRecorder() {
+    public CacheRecorder(Class<? extends Cache<?, ?>> cacheType) {
+        this.cacheType = cacheType;
         cacheHits = 0;
         cacheMisses = 0;
         cachePuts = 0;
@@ -27,6 +29,7 @@ public class CacheRecorder {
     
     public HashMap<String, Integer> metrics() {
         HashMap<String, Integer> metrics = new HashMap<>();
+        metrics.put(MetricType.CACHE_TYPE.identifier(), cacheType.hashCode());
         metrics.put(MetricType.CACHE_HITS.identifier(), cacheHits);
         metrics.put(MetricType.CACHE_MISSES.identifier(), cacheMisses);
         metrics.put(MetricType.CACHE_PUTS.identifier(), cachePuts);

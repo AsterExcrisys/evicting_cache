@@ -71,12 +71,12 @@ public class CacheBuilder<K, V> {
         return this;
     }
 
-    public CacheBuilder<K, V> fixedCapacity(boolean isFixed) {
+    public CacheBuilder<K, V> capacityFixed(boolean isFixed) {
         this.isFixed = isFixed;
         return this;
     }
 
-    public CacheBuilder<K, V> enabledMetrics(boolean isEnabled) {
+    public CacheBuilder<K, V> metricsEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
         return this;
     }
@@ -85,61 +85,61 @@ public class CacheBuilder<K, V> {
         return switch (policy) {
             case LRU -> {
                 if (isFixed) {
-                    yield new LRUCache<>(capacity);
+                    yield new LRUCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case LFU -> {
                 if (isFixed) {
-                    yield new LFUCache<>(capacity);
+                    yield new LFUCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case MRU -> {
                 if (isFixed) {
-                    yield new MRUCache<>(capacity);
+                    yield new MRUCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case MFU -> {
                 if (isFixed) {
-                    yield new MFUCache<>(capacity);
+                    yield new MFUCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case FIFO -> {
                 if (isFixed) {
-                    yield new FIFOCache<>(capacity);
+                    yield new FIFOCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case LIFO -> {
                 if (isFixed) {
-                    yield new LIFOCache<>(capacity);
+                    yield new LIFOCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case TIME -> {
                 if (isFixed) {
-                    yield new TimeCache<>(capacity, time, unit, mode);
+                    yield new TimeCache<>(capacity, isEnabled, time, unit, mode);
                 }
                 yield null;
             }
             case EXPIRE -> {
                 if (isFixed) {
-                    yield new ExpireCache<>(capacity, mode);
+                    yield new ExpireCache<>(capacity, isEnabled, mode);
                 }
                 yield null;
             }
             case PRIORITY -> {
                 if (isFixed) {
-                    yield new PriorityCache<>(capacity);
+                    yield new PriorityCache<>(capacity, isEnabled);
                 }
                 yield null;
             }
             case RANDOM -> {
                 if (isFixed) {
-                    yield new RandomCache<>(capacity);
+                    yield new RandomCache<>(capacity, isEnabled);
                 }
                 yield null;
             }

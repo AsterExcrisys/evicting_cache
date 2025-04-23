@@ -2,6 +2,7 @@ import com.asterexcrisys.evicache.entries.BasicCacheEntry;
 import com.asterexcrisys.evicache.Cache;
 import com.asterexcrisys.evicache.CacheBuilder;
 import com.asterexcrisys.evicache.models.EvictionPolicy;
+import com.asterexcrisys.evicache.models.ExpireMode;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -13,8 +14,10 @@ public class Main {
                 .<Integer, String>newBuilder()
                 .evictionPolicy(EvictionPolicy.RANDOM)
                 .expireTime(1, TimeUnit.MINUTES)
-                .fixedCapacity(true)
+                .expireMode(ExpireMode.AFTER_ACCESS)
                 .initialCapacity(10)
+                .capacityFixed(true)
+                .metricsEnabled(true)
                 .build();
         cache.put(new BasicCacheEntry<>(1, "one"));
         cache.put(new BasicCacheEntry<>(2, "two"));
@@ -34,6 +37,7 @@ public class Main {
             System.out.println(cache.popTop());
         }
         System.out.println(cache);
+        System.out.println(cache.metrics());
     }
 
 }

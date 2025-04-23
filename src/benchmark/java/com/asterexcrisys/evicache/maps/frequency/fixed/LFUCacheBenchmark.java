@@ -16,7 +16,7 @@ public class LFUCacheBenchmark {
 
     @Setup(Level.Iteration)
     public void setup() {
-        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.LFU).fixedCapacity(true).initialCapacity(1000).build();
+        cache = CacheBuilder.<Integer, Integer>newBuilder().evictionPolicy(EvictionPolicy.LFU).capacityFixed(true).initialCapacity(1000).build();
         for (int i = 0; i < 1000; i++) {
             cache.put(new BasicCacheEntry<>(i, i));
         }
